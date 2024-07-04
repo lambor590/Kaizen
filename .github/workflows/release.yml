@@ -1,0 +1,31 @@
+name: Publish and Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: "*"
+
+jobs:
+  gh-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download artifacts
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow_conclusion: success
+          workflow: build.yml
+          path: ./out
+
+      - name: Get the latest tag
+        run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./out/**
+          name: Ghost Toolkit ${{ env.TAG }}
+          tag_name: ${{ env.TAG }}
