@@ -92,7 +92,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           cargo build --target=x86_64-pc-windows-gnu --release
-          copy "target\x86_64-pc-windows-gnu\release\ghost-toolkit.exe" "out\ghost-toolkit-windows-gnu.exe"
+          cp "target/x86_64-pc-windows-gnu/release/ghost-toolkit.exe" "out/ghost-toolkit-windows-gnu.exe"
 
       - name: Upload build artefacts
         uses: actions/upload-artifact@v4
