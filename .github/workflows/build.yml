@@ -88,12 +88,6 @@ jobs:
         env:
           CC_aarch64_unknown_linux_musl: clang-17
 
-      - name: Build Windows GNU
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          cargo build --target=x86_64-pc-windows-gnu --release
-          cp "target/x86_64-pc-windows-gnu/release/ghost-toolkit.exe" "out/ghost-toolkit-windows-gnu.exe"
-
       - name: Upload build artefacts
         uses: actions/upload-artifact@v4
         with:
