@@ -10,7 +10,7 @@ pub struct Updater;
 
 impl Updater {
     pub fn check_updates() -> Result<(), Box<dyn std::error::Error>> {
-        let current_version = env!("CARGO_PKG_VERSION");
+        let current_version: &str = env!("CARGO_PKG_VERSION");
         let response: serde_json::Value = reqwest::blocking::Client::new()
             .get("https://api.github.com/repos/lambor590/Ghost-Toolkit/tags")
             .header("User-Agent", "Ghost-Toolkit")
@@ -21,7 +21,9 @@ impl Updater {
         let latest_version: &str = &response[0]["name"].as_str().unwrap();
 
         if &current_version == &latest_version {
-            Logger::info("Esta es la última versión. No hay actualización disponible.");
+            Logger::info(
+                "Ejecutando la última versión. Sin actualizaciones disponibles.",
+            );
             return Ok(());
         }
 
@@ -33,7 +35,7 @@ impl Updater {
             .as_str(),
         );
 
-        let arch_extension = match (consts::OS, consts::ARCH) {
+        let arch_extension: &str = match (consts::OS, consts::ARCH) {
             ("windows", "x86_64") => "windows-msvc.exe",
             ("linux", "x86_64") => "linux-x64",
             ("linux", "aarch64") => "linux-arm64",
