@@ -26,7 +26,7 @@ impl Updater {
         let latest_version: &str = &response[0]["name"].as_str().unwrap();
 
         if &current_version == &latest_version {
-            Logger::info("No hay actualizaciones disponibles.");
+            Logger::info("No hay actualizaciones.");
             return Ok(());
         }
 
@@ -56,6 +56,7 @@ impl Updater {
         write(&new_bin, &binary)?;
 
         Logger::info("Descarga completada. Actualizando en caliente...");
+        std::thread::sleep(std::time::Duration::from_secs(1));
 
         self_replace::self_replace(&new_bin)?;
         remove_file(&new_bin)?;

@@ -4,7 +4,7 @@ mod updater;
 use crossterm::{
     cursor, execute,
     style::{Color, Stylize},
-    terminal::SetTitle,
+    terminal::{Clear, ClearType, SetTitle},
 };
 use logger::Logger;
 use std::{
@@ -64,6 +64,10 @@ fn main() {
     if let Err(e) = Updater::check_updates() {
         Logger::error(format!("Error al comprobar actualizaciones: {}", &e).as_str());
     }
+
+    thread::sleep(Duration::from_secs(2));
+    execute!(stdout(), cursor::MoveToPreviousLine(1)).unwrap();
+    execute!(stdout(), Clear(ClearType::CurrentLine)).unwrap();
 
     stdin().read_line(&mut String::new()).unwrap();
 }
