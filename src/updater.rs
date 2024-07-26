@@ -60,7 +60,7 @@ impl Updater {
         self_replace::self_replace(&new_bin)?;
         remove_file(&new_bin)?;
 
-        execute!(stdout(), Clear(ClearType::All)).unwrap();
+        execute!(stdout(), Clear(ClearType::FromCursorUp)).unwrap();
         execute!(stdout(), MoveTo(0, 0)).unwrap();
 
         process::Command::new(current_exe().unwrap())
