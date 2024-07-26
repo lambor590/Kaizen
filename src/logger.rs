@@ -1,4 +1,4 @@
-use yansi::Paint;
+use crossterm::style::Stylize;
 
 pub struct Logger;
 
@@ -6,7 +6,7 @@ impl Logger {
     pub fn info(message: &str) {
         println!(
             "{} {}",
-            " INFO ".bold().on_black().bright_blue().invert(),
+            " INFO ".bold().black().on_blue(),
             message
         );
     }
@@ -14,7 +14,7 @@ impl Logger {
     pub fn warn(message: &str) {
         println!(
             "{} {}",
-            " WARN ".bold().on_black().bright_yellow().invert(),
+            " WARN ".bold().black().on_yellow(),
             message
         );
     }
@@ -22,7 +22,7 @@ impl Logger {
     pub fn error(message: &str) {
         println!(
             "{} {}",
-            " ERROR ".bold().on_black().bright_red().invert(),
+            " ERROR ".bold().black().on_red(),
             message
         );
     }
