@@ -4,7 +4,12 @@ use crossterm::{
     execute,
     terminal::{Clear, ClearType},
 };
-use std::env::{consts, current_exe};
+use std::{
+    env::{consts, current_exe},
+    fs::{remove_file, write},
+    io::stdout,
+    process,
+};
 
 pub struct Updater;
 
@@ -21,19 +26,11 @@ impl Updater {
         let latest_version: &str = &response[0]["name"].as_str().unwrap();
 
         if &current_version == &latest_version {
-            Logger::info(
-                "Ejecutando la última versión. Sin actualizaciones disponibles.",
-            );
+            Logger::info("No hay actualizaciones disponibles.");
             return Ok(());
         }
 
-        Logger::warn(
-            format!(
-                "Estás utilizando una versión obsoleta. La última versión es la {}. Descargando...",
-                &latest_version
-            )
-            .as_str(),
-        );
+        Logger::warn("Hay una nueva versión disponible. Descargando...");
 
         let arch_extension: &str = match (consts::OS, consts::ARCH) {
             ("windows", "x86_64") => "windows-msvc.exe",
@@ -56,20 +53,20 @@ impl Updater {
             consts::EXE_SUFFIX
         );
 
-        std::fs::write(&new_bin, &binary)?;
+        write(&new_bin, &binary)?;
 
         Logger::info("Descarga completada. Actualizando en caliente...");
 
         self_replace::self_replace(&new_bin)?;
-        std::fs::remove_file(&new_bin)?;
+        remove_file(&new_bin)?;
 
-        execute!(std::io::stdout(), Clear(ClearType::All)).unwrap();
-        execute!(std::io::stdout(), MoveTo(0, 0)).unwrap();
+        execute!(stdout(), Clear(ClearType::All)).unwrap();
+        execute!(stdout(), MoveTo(0, 0)).unwrap();
 
-        std::process::Command::new(current_exe().unwrap())
+        process::Command::new(current_exe().unwrap())
             .spawn()
             .expect("Error al abrir la nueva instancia");
 
-        std::process::exit(0);
+        process::exit(0);
     }
 }
