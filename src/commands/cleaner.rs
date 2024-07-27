@@ -1,5 +1,3 @@
-use std::fs::remove_dir_all;
-
 use crate::{console::Console, logger::Logger};
 
 pub struct Cleaner;
@@ -24,12 +22,18 @@ impl Cleaner {
                 let path: &std::path::PathBuf = &entry.path();
                 let result: Result<(), std::io::Error> = if path.is_file() {
                     if let Ok(metadata) = std::fs::metadata(path) {
-                        freed_space += metadata.len();
-                    }
-                    std::fs::remove_file(path)
+                        if std::fs::remove_file(path).is_ok() {
+                            freed_space += metadata.len()
+                        }
+                    };
+                    Ok(())
                 } else if path.is_dir() {
                     let dir_size = Self::get_dir_size(path);
-                    remove_dir_all(path).map(|_| freed_space += dir_size)
+
+                    if std::fs::remove_dir_all(path).is_ok() {
+                        freed_space += dir_size
+                    }
+                    Ok(())
                 } else {
                     Ok(())
                 };
