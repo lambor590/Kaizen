@@ -50,16 +50,14 @@ impl Console {
 
         execute!(stdout(), cursor::MoveTo(0, 0), cursor::Hide).unwrap();
 
-        for color_step in (0..&rainbow_colors.len() * 4 + &title.len()).rev() {
+        for color_step in (0..&rainbow_colors.len() * 4 + title.len()).rev() {
             for &line in &title {
-                let padding: usize = (&term_width - &line.len()).saturating_div(2);
+                let padding: usize = (term_width - line.len()).saturating_div(2);
                 print!("{:width$}", "", width = &padding);
                 for (ch_idx, ch) in line.chars().enumerate() {
                     print!(
                         "{}",
-                        ch.with(
-                            rainbow_colors[(&color_step + &ch_idx / 2) % &rainbow_colors.len()]
-                        )
+                        ch.with(rainbow_colors[(color_step + &ch_idx / 2) % rainbow_colors.len()])
                     );
                 }
                 println!();
@@ -81,7 +79,7 @@ impl Console {
 
     pub fn press_any_key() {
         Logger::info("Presiona una tecla para continuar...");
-        stdin().read(&mut [0u8]).unwrap();
+        stdin().read_exact(&mut [0u8]).unwrap();
 
         Self::clear();
     }

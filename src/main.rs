@@ -19,7 +19,7 @@ fn main() {
     Console::animate_logo();
 
     if let Err(e) = &Updater::check_updates() {
-        Logger::error(&format!("Error al comprobar actualizaciones: {}", &e).as_str());
+        Logger::error(format!("Error al comprobar actualizaciones: {}", &e).as_str());
     }
 
     Console::sleep_secs(2);

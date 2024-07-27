@@ -22,9 +22,9 @@ impl Cleaner {
             for entry in entries.flatten() {
                 let path: &std::path::PathBuf = &entry.path();
                 let result: Result<(), std::io::Error> = if path.is_file() {
-                    std::fs::remove_file(&path)
+                    std::fs::remove_file(path)
                 } else if path.is_dir() {
-                    remove_dir_all(&path)
+                    remove_dir_all(path)
                 } else {
                     Ok(())
                 };
