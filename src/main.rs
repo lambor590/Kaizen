@@ -9,6 +9,8 @@ use crossterm::{cursor, execute};
 use logger::Logger;
 use std::io::stdout;
 use updater::Updater;
+
+#[cfg(target_os = "windows")]
 use windows_api::WindowsAPI;
 
 fn main() {
@@ -23,6 +25,7 @@ fn main() {
     Console::sleep_secs(2);
     Console::clear();
 
+    #[cfg(target_os = "windows")]
     WindowsAPI::check_admin();
 
     Console::menu();
