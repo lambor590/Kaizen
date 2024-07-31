@@ -5,13 +5,12 @@ use crossterm::{
     style::{Color, Stylize},
     terminal::{Clear, ClearType, SetTitle},
 };
-use std::{
-    io::{stdin, stdout, Read},
-    thread,
-    time::Duration,
-};
+use std::{io::stdout, thread, time::Duration};
 
-use crate::{commands::Cleaner, logger::Logger};
+use crate::{
+    commands::{Activator, Cleaner},
+    logger::Logger,
+};
 
 impl Console {
     pub fn set_title(message: &str) {
@@ -27,7 +26,7 @@ impl Console {
         .unwrap();
     }
 
-    pub fn animate_logo() {
+    pub fn animate_logo(fast: bool) {
         let title: [&str; 6] = [
             "  _____ _______ ",
             " / ____|__   __|",
@@ -48,9 +47,11 @@ impl Console {
             Color::Blue,
         ];
 
-        execute!(stdout(), cursor::MoveTo(0, 0), cursor::Hide).unwrap();
+        execute!(stdout(), &cursor::MoveTo(0, 0), &cursor::Hide).unwrap();
 
-        for color_step in (0..&rainbow_colors.len() * 4 + title.len()).rev() {
+        let speed: usize = if fast { 2 } else { 4 };
+
+        for color_step in (0..&rainbow_colors.len() * speed + title.len()).rev() {
             for &line in &title {
                 let padding: usize = (term_width - line.len()).saturating_div(2);
                 print!("{:width$}", "", width = &padding);
@@ -78,35 +79,36 @@ impl Console {
     }
 
     pub fn press_any_key() {
-        Logger::info("Presiona una tecla para continuar...");
-        stdin().read_exact(&mut [0u8]).unwrap();
+        let mut countdown: i32 = 5;
 
-        Self::clear();
+        execute!(stdout(), &cursor::Hide, &cursor::MoveToNextLine(1)).unwrap();
+
+        while countdown >= 0 {
+            Self::sleep_secs(1);
+            Logger::info(&format!("Volviendo al menú en {} segundos...", &countdown));
+            execute!(stdout(), &cursor::MoveToPreviousLine(1)).unwrap();
+            countdown -= 1;
+        }
     }
 
     pub fn menu() {
-        loop {
-            let options: Vec<&str> = vec![
-                "Limpiar archivos temporales",
-                "Activar Windows de forma permanente",
-            ];
-            let action: Result<&str, inquire::InquireError> =
-                inquire::Select::new("¿Qué quieres hacer?", options)
-                    .with_help_message("Selecciona una opción usando las flechas y pulsando Enter")
-                    .prompt();
+        let options: Vec<&str> = vec![
+            "Limpiar archivos temporales",
+            "Activar Windows de forma permanente",
+        ];
 
-            Self::clear();
+        let action: Result<&str, inquire::InquireError> =
+            inquire::Select::new("¿Qué quieres hacer?", options)
+                .with_help_message("Selecciona una opción usando las flechas y pulsando Enter")
+                .prompt();
 
-            match &action {
-                Ok("Limpiar archivos temporales") => Cleaner::run().unwrap(),
-                Ok("Activar Windows de forma permanente") => {
-                    Logger::info("Activando Windows de forma permanente...")
-                }
-                _ => Logger::warn("Opción no reconocida."),
-            }
-
-            Self::press_any_key();
-            Self::animate_logo();
+        match action {
+            Ok("Limpiar archivos temporales") => Cleaner::run(),
+            Ok("Activar Windows de forma permanente") => Activator::run(),
+            _ => Logger::error("Opción no reconocida."),
         }
+
+        Self::press_any_key();
+        Self::animate_logo(true);
     }
 }
