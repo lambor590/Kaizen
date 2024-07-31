@@ -26,7 +26,6 @@ impl Updater {
         let latest_version: &str = response[0]["name"].as_str().unwrap();
 
         if current_version == latest_version {
-            Logger::info("No hay actualizaciones.");
             return Ok(());
         }
 
