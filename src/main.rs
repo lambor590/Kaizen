@@ -16,17 +16,18 @@ use windows_api::WindowsAPI;
 fn main() {
     Console::set_title(&format!("Ghost Toolkit - v{}", &env!("CARGO_PKG_VERSION")));
     execute!(stdout(), &cursor::MoveToRow(7), &cursor::SavePosition).unwrap();
-    Console::animate_logo();
+    Console::animate_logo(false);
 
     if let Err(e) = &Updater::check_updates() {
-        Logger::error(format!("Error al comprobar actualizaciones: {}", &e).as_str());
+        Logger::error(&format!("Error al comprobar actualizaciones: {}", &e));
+        Console::sleep_secs(2);
+        Console::clear();
     }
-
-    Console::sleep_secs(2);
-    Console::clear();
 
     #[cfg(target_os = "windows")]
     WindowsAPI::check_admin();
 
-    Console::menu();
+    loop {
+        Console::menu();
+    }
 }
