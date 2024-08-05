@@ -78,8 +78,8 @@ impl Console {
         thread::sleep(Duration::from_secs(duration));
     }
 
-    pub fn press_any_key() {
-        let mut countdown: i32 = 5;
+    pub fn rich_wait(seconds: i32) {
+        let mut countdown: i32 = seconds;
 
         execute!(stdout(), &cursor::Hide, &cursor::MoveToNextLine(1)).unwrap();
 
@@ -94,7 +94,7 @@ impl Console {
     pub fn menu() {
         let options: Vec<&str> = vec![
             "Limpiar archivos temporales",
-            "Activar Windows de forma permanente",
+            "Activar Windows permanentemente por HWID",
         ];
 
         let action: Result<&str, inquire::InquireError> =
@@ -104,11 +104,11 @@ impl Console {
 
         match action {
             Ok("Limpiar archivos temporales") => Cleaner::run(),
-            Ok("Activar Windows de forma permanente") => Activator::run(),
+            Ok("Activar Windows permanentemente por HWID") => Activator::run(),
             _ => Logger::error("Opción no reconocida."),
         }
 
-        Self::press_any_key();
+        Self::rich_wait(5);
         Self::animate_logo(true);
     }
 }
