@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    font-family: system-ui, -apple-system, Ubuntu, sans-serif;
+    user-select: none;
+}
+
+:root:has(
+    :is(
+        .modal-open,
+        .modal:target,
+        .modal-toggle:checked + .modal,
+        .modal[open]
+      )
+  ) {
+  scrollbar-gutter: unset;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    text-align: center;
+    min-width: 320px;
+    min-height: 100vh;
+    padding: 0;
+}
