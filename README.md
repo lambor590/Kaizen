@@ -1,5 +1,5 @@
-## Ghost Toolkit
+## Kaizen
 
-Varias herramientas en un solo programa.
+Varias herramientas para ahorrar tiempo y mantener tu equipo en buen estado.
 
 ---
