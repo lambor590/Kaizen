@@ -1,35 +1,58 @@
-name: Publish and Release
+name: 'publish'
 
 on:
   workflow_dispatch:
   push:
-    tags: "*"
+    branches:
+      - release
 
 jobs:
-  gh-release:
-    runs-on: ubuntu-latest
-
+  publish-tauri:
     permissions:
       contents: write
-      
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' # for Intel based macs.
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v3
+      - name: setup node
+        uses: actions/setup-node@v4
         with:
-          workflow_conclusion: success
-          workflow: build.yml
-          path: ./out
+          node-version: lts/*
 
-      - name: Get the latest tag
-        run: echo "TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
         with:
-          files: ./out/**
-          name: Ghost Toolkit ${{ env.TAG }}
-          tag_name: ${{ env.TAG }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - uses: tauri-apps/tauri-action@dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: __VERSION__
+          releaseName: 'Kaizen v__VERSION__'
+          releaseBody: 'Comprueba el archivo que debes descargar según tu sistema operativo.'
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
