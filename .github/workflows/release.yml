@@ -3,8 +3,7 @@ name: 'publish'
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'package.json'
+    tags: "*"
 
 jobs:
   publish-tauri:
