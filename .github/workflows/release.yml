@@ -32,7 +32,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'npm'
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -50,14 +49,6 @@ jobs:
 
       - name: install frontend dependencies
         run: npm ci
-
-      - name: install tauri cli for macos
-        if: contains(matrix.platform, 'macos')
-        run: npm install @tauri-apps/cli-darwin-arm64
-
-      - name: install tauri cli for linux
-        if: matrix.platform == 'ubuntu-22.04'
-        run: npm install @tauri-apps/cli-linux-x64-gnu
 
       - uses: tauri-apps/tauri-action@dev
         env:
