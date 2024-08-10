@@ -57,9 +57,6 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
-      - name: install specific OS dependencies
-        run: npm install --save-dev @tauri-apps/cli vite @preact/preset-vite
-
       - uses: tauri-apps/tauri-action@dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
