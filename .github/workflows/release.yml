@@ -47,13 +47,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: install tauri cli for macos
-        if: contains(matrix.platform, 'macos')
-        run: npm install @tauri-apps/cli-darwin-arm64
-
-      - name: install tauri cli for linux
-        if: matrix.platform == 'ubuntu-22.04'
-        run: npm install @tauri-apps/cli-linux-x64-gnu
+      - name: install frontend dependencies
+        run: npm ci
 
       - uses: tauri-apps/tauri-action@dev
         env:
