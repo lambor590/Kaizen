@@ -55,10 +55,10 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: install frontend dependencies
-        run: npm ci
+        run: npm install
 
-      - name: install tauri cli
-        run: npm install --save-dev @tauri-apps/cli
+      - name: install specific OS dependencies
+        run: npm install --save-dev @tauri-apps/cli vite @preact/preset-vite
 
       - uses: tauri-apps/tauri-action@dev
         env:
