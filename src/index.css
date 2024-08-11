@@ -20,9 +20,6 @@
 
 body {
     margin: 0;
-    display: flex;
-    place-items: center;
-    text-align: center;
     min-width: 320px;
     min-height: 100vh;
     padding: 0;
