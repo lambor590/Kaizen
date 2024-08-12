@@ -7,15 +7,15 @@
     user-select: none;
 }
 
-:root:has(
-    :is(
-        .modal-open,
+:root:has( :is(.modal-open,
         .modal:target,
         .modal-toggle:checked + .modal,
-        .modal[open]
-      )
-  ) {
-  scrollbar-gutter: unset;
+        .modal[open])) {
+    scrollbar-gutter: unset;
+}
+
+html:has(.drawer-toggle:checked) {
+    scrollbar-gutter: unset;
 }
 
 body {
