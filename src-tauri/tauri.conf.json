@@ -35,7 +35,7 @@
         "resizable": true,
         "title": "Kaizen",
         "width": 1024,
-        "height": 520,
+        "height": 512,
         "minWidth": 660,
         "minHeight": 300,
         "center": true,
