@@ -14,17 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest'
-            args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+        os: [windows-latest]
 
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,26 +25,13 @@ jobs:
         with:
           node-version: lts/*
 
-      - name: Install Rust for macOS
-        if: matrix.platform == 'macos-latest'
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-darwin, x86_64-apple-darwin
-
       - name: Install Rust
-        if: matrix.platform != 'macos-latest'
         uses: dtolnay/rust-toolchain@stable
       
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
-
-      - name: install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: install frontend dependencies
         run: npm install
@@ -64,7 +43,6 @@ jobs:
         with:
           tagName: __VERSION__
           releaseName: 'Kaizen v__VERSION__'
-          releaseBody: 'Comprueba el archivo que debes descargar según tu sistema operativo.'
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
