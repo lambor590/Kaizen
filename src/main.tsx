@@ -10,4 +10,4 @@ render(
     </BrowserRouter>,
     document.getElementById("root")!
 );
-invoke('close_splash')
+invoke('close_splash');
