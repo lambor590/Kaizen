@@ -5,15 +5,15 @@ interface Props {
   onFinish?: () => void;
 }
 
-export default function Countdown({ initialNumber, onFinish }: Props) {
-  const [timeLeft, setTimeLeft] = useState(initialNumber);
+export default function Countdown(props: Props) {
+  const [timeLeft, setTimeLeft] = useState(props.initialNumber);
 
   useEffect(() => {
     let timer = setInterval(() => {
       setTimeLeft((time) => {
         if (time !== 0) return time - 1;
         clearInterval(timer);
-        onFinish && onFinish();
+        props.onFinish?.();
         return 0;
       });
     }, 1000);

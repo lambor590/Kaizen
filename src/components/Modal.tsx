@@ -9,18 +9,18 @@ interface Props {
   onClose?: () => void;
 }
 
-export default function Modal({ isOpen, title = "", message, children, isDismissable = true, onClose }: Props) {
+export default function Modal(props: Props) {
   return (
-    <dialog className={`modal overflow-hidden backdrop-blur-sm backdrop-brightness-90 ${isOpen ? 'modal-open' : ''}`}>
+    <dialog className={`modal overflow-hidden backdrop-blur-sm backdrop-brightness-90 ${props.isOpen ? 'modal-open' : ''}`}>
       <div className="modal-box text-left">
-        <h3 className="font-bold text-lg">{title}</h3>
-        <p className="pt-4">{message}</p>
-        {children}
+        <h3 className="font-bold text-lg">{props.title}</h3>
+        <p className="pt-4">{props.message}</p>
+        {props.children}
         {
-          isDismissable &&
+          props.isDismissable &&
           <div className="modal-action">
             <form method="dialog">
-              <button className="btn" onClick={onClose}>Cerrar</button>
+              <button className="btn" onClick={props.onClose}>Cerrar</button>
             </form>
           </div>
         }
