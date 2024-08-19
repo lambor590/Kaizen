@@ -1,6 +1,6 @@
 import { installUpdate } from '@tauri-apps/api/updater';
-import Modal from './Modal'
-import Countdown from './Countdown'
+import Modal from './generic/Modal'
+import Countdown from './generic/Countdown'
 
 export default function UpdateModal() {
 
