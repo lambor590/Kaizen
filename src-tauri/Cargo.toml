@@ -12,6 +12,7 @@ tauri = { version = "1", features = [ "updater", "shell-open"] }
 serde = { version = "1", features = ["derive"] }
 winapi = { version = "0.3.9", features = ["securitybaseapi", "handleapi"] }
 serde_json = "1"
+thiserror = "1.0.63"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
