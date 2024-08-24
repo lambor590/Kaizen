@@ -1,10 +1,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod tools;
 mod windows_api;
 
-use windows_api::WindowsAPI;
 use tauri::{Manager, Window};
-
+use windows_api::WindowsAPI;
 
 #[tauri::command]
 async fn close_splash(window: Window) {
@@ -13,7 +13,7 @@ async fn close_splash(window: Window) {
         .expect("no window labeled 'splash' found")
         .close()
         .unwrap();
-    
+
     window
         .get_window("main")
         .expect("no window labeled 'main' found")
@@ -31,6 +31,7 @@ async fn check_admin(ask: bool) -> bool {
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tools::init())
         .invoke_handler(tauri::generate_handler![close_splash, check_admin])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
