@@ -15,7 +15,7 @@ pub async fn run_cleaner<R: Runtime>(window: Window<R>, dirs: Vec<String>) -> Ka
         let path: PathBuf = PathBuf::from(dir);
 
         if let Ok(entries) = fs::read_dir(&path) {
-            entries.filter_map(Result::ok).for_each(|entry| {
+            entries.filter_map(Result::ok).for_each(|entry: fs::DirEntry| {
                 total_files += 1;
 
                 let path: PathBuf = entry.path();
