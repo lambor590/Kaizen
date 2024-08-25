@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import Settings from "@/pages/Settings";
 import Roadmap from "@/pages/Roadmap";
 import Cleaner from "@/pages/tools/Cleaner";
+import Downloader from "@/pages/tools/Downloader";
 
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/tools/cleaner" element={<Cleaner />} />
+              <Route path="/tools/downloader" element={<Downloader />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/roadmap" element={<Roadmap />} />
             </Routes>
@@ -80,6 +82,7 @@ export default function App() {
                 <ul>
                   <li>
                     <NavLink to="/tools/cleaner">Liberador de espacio</NavLink>
+                    <NavLink to="/tools/downloader">Descarga de vídeos y audios</NavLink>
                   </li>
                 </ul>
               </details>
