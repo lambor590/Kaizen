@@ -6,10 +6,10 @@ import {
 import { checkUpdate } from "@tauri-apps/api/updater";
 import { useState, useEffect } from "preact/hooks";
 import UpdateModal from "@/components/UpdateModal";
-import Settings from "@/pages/Settings";
 import Home from "@/pages/Home";
-import Cleaner from "@/pages/tools/Cleaner";
+import Settings from "@/pages/Settings";
 import Roadmap from "@/pages/Roadmap";
+import Cleaner from "@/pages/tools/Cleaner";
 
 
 export default function App() {
