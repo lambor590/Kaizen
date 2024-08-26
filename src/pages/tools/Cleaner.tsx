@@ -64,9 +64,9 @@ export default function Cleaner() {
       <CheckBox text="Archivos temporales del usuario" checked={selectedDirs.temp} onChange={() => handleCheckboxChange('temp')} />
       <CheckBox text="Archivos temporales del sistema" checked={selectedDirs.tempSystem} onChange={() => handleCheckboxChange('tempSystem')} />
       <CheckBox text="Descargas" checked={selectedDirs.downloads} onChange={() => handleCheckboxChange('downloads')} />
-      <div className="flex justify-between items-center">
+      <div className="lg:flex justify-between items-center mt-4 lg:mt-0">
         <button id="button" className="btn btn-primary" onClick={runCleaner}>Liberar espacio</button>
-        <div className="stats shadow-lg">
+        <div className="stats shadow-lg mt-4 lg:mt-0">
           <div className="stat place-items-center">
             <div className="stat-title">Archivos eliminados</div>
             <div className="stat-value">{stats.deleted}</div>
