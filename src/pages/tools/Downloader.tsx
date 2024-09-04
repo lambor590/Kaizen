@@ -2,83 +2,59 @@ import { invoke } from "@tauri-apps/api";
 import { useEffect, useState } from "preact/hooks";
 import { open } from "@tauri-apps/api/dialog";
 
-type VideoFormat = {
-  format_id: string;
-  format_note: string;
-  filesize: number;
-};
-
 type VideoData = {
   title: string;
   thumbnail: string;
   duration_string: string;
   channel: string;
   uploader: string;
-  formats: VideoFormat[];
   original_url: string;
 };
 
 export default function Downloader() {
-  const [downloaderConfig, setDownloaderConfig] = useState({
-    video_url: "",
-    format: "video",
-    quality: "best",
-    output_folder: "",
-  });
-
+  const [config, setConfig] = useState({ video_url: "", format: "video", quality: "best", output_folder: "" });
   const [videoData, setVideoData] = useState<VideoData>();
   const [depsInstalled, setDepsInstalled] = useState(true);
-
-  const getVideoData = async (url: string) => {
-    const dataJson = await invoke<string>("plugin:tools|get_video_data", { url });
-    return dataJson ? JSON.parse(dataJson) : null;
-  }
-
-  const handleChange = (e: Event) => {
-    const { name, value } = e.target as HTMLInputElement;
-
-    if (name === "video_url" && (!videoData || value !== videoData.original_url)) {
-      getVideoData(value).then(data => {
-        setVideoData(data);
-      });
-    }
-
-    setDownloaderConfig(prev => ({ ...prev, [name]: value }));
-  };
-
-  const selectFolder = async () => {
-    try {
-      const selected = await open({ directory: true, title: "Selecciona la carpeta donde se descargarán los vídeos/audios" });
-
-      if (selected && typeof selected === "string") {
-        setDownloaderConfig(prev => ({ ...prev, output_folder: selected }));
-        (document.getElementById("folder-path") as HTMLInputElement).value = selected;
-      } else {
-        console.error("Resultado de selección de carpeta inesperado:", selected);
-      }
-    } catch (error) {
-      console.error("Error al seleccionar carpeta:", error);
-    }
-  }
 
   useEffect(() => {
     invoke<boolean>("plugin:tools|check_downloader_deps").then(setDepsInstalled);
   }, []);
 
-  const installDeps = async (button: HTMLButtonElement) => {
-    button.classList.add("btn-disabled");
-    await invoke("plugin:tools|install_downloader_deps");
-    button.classList.remove("btn-disabled");
-    setDepsInstalled(true);
+  const handleChange = async (e: Event) => {
+    const { name, value } = e.target as HTMLInputElement;
+    setConfig(prev => ({ ...prev, [name]: value }));
+
+    if (name === "video_url" && (!videoData || value !== videoData.original_url)) {
+      const dataJson = await invoke<string>("plugin:tools|get_video_data", { url: value });
+      setVideoData(dataJson ? JSON.parse(dataJson) : null);
+    }
+  };
+
+  const selectFolder = async () => {
+    const selected = await open({ directory: true, title: "Selecciona la carpeta donde se descargarán los vídeos/audios" });
+    if (selected && typeof selected === "string") {
+      setConfig(prev => ({ ...prev, output_folder: selected }));
+      (document.getElementById("folder-path") as HTMLInputElement).value = selected;
+    }
   }
 
-  const runDownloader = async (button: HTMLButtonElement) => {
-    if (!downloaderConfig.video_url || !downloaderConfig.output_folder) return;
-
+  const performAction = async (action: () => Promise<void>, buttonId: string) => {
+    const button = document.getElementById(buttonId) as HTMLButtonElement;
     button.classList.add("btn-disabled");
-    await invoke("plugin:tools|run_downloader", { config: downloaderConfig })
+    await action();
     button.classList.remove("btn-disabled");
   };
+
+  const installDeps = () => performAction(async () => {
+    await invoke("plugin:tools|install_downloader_deps");
+    setDepsInstalled(true);
+  }, 'install-deps-button');
+
+  const runDownloader = () => performAction(async () => {
+    if (config.video_url && config.output_folder) {
+      await invoke("plugin:tools|run_downloader", { config });
+    }
+  }, 'run-downloader-button');
 
   return (
     <div className="prose">
@@ -96,7 +72,7 @@ export default function Downloader() {
             Presiona este botón para descargarlos automáticamente donde está instalado Kaizen.<br />
             Solo tomará unos segundos.
           </p>
-          <button id="btn-deps" className="btn btn-primary" onClick={(e) => installDeps(e.target as HTMLButtonElement)}>Descargar</button>
+          <button id="install-deps-button" className="btn btn-primary" onClick={installDeps}>Descargar</button>
         </>
         :
         <>
@@ -146,7 +122,7 @@ export default function Downloader() {
               </div>
             </div>
           )}
-          <button className="btn btn-primary" onClick={(e) => runDownloader(e.target as HTMLButtonElement)}>Descargar</button>
+          <button id="run-downloader-button" className="btn btn-primary" onClick={runDownloader}>Descargar</button>
         </>
       }
     </div>
