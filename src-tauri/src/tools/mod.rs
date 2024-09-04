@@ -7,6 +7,7 @@ use tauri::{
 use thiserror::Error;
 
 pub mod cleaner;
+pub mod downloader;
 
 pub type KaizenResult<T> = std::result::Result<T, KaizenSerializableError>;
 
@@ -33,6 +34,12 @@ impl Serialize for KaizenSerializableError {
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("tools")
-        .invoke_handler(tauri::generate_handler![cleaner::run_cleaner])
+        .invoke_handler(tauri::generate_handler![
+            cleaner::run_cleaner,
+            downloader::run_downloader,
+            downloader::get_video_data,
+            downloader::check_downloader_deps,
+            downloader::install_downloader_deps,
+        ])
         .build()
 }
