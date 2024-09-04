@@ -19,8 +19,9 @@ export default function Cleaner() {
   const [selectedDirs, setSelectedDirs] = useState({ temp: true, tempSystem: true, downloads: true });
 
   useEffect(() => {
-    tempdir().then(temp => setDirs(d => ({ ...d, temp })));
-    downloadDir().then(downloads => setDirs(d => ({ ...d, downloads })));
+    Promise.all([tempdir(), downloadDir()]).then(([temp, downloads]) =>
+      setDirs({ temp, downloads })
+    );
 
     const unlisten = listen("cleaner-data", (event) => {
       const { deleted_files, total_files, freed_space } = event.payload as EventData;
@@ -32,18 +33,16 @@ export default function Cleaner() {
     };
   }, []);
 
-  const systemDrive = dirs.downloads.charAt(0) + ":\\";
   const cleanableDirs = {
     temp: dirs.temp,
-    tempSystem: `${systemDrive}Windows\\Temp`,
+    tempSystem: `${dirs.downloads.charAt(0)}:\\Windows\\Temp`,
     downloads: dirs.downloads
   };
 
-  const handleCheckboxChange = (dir: DirType) => {
+  const handleCheckboxChange = (dir: DirType) =>
     setSelectedDirs(prev => ({ ...prev, [dir]: !prev[dir] }));
-  };
 
-  const runCleaner = () => {
+  const runCleaner = async () => {
     const btn = document.querySelector("#button");
     btn?.classList.add("btn-disabled");
 
@@ -51,9 +50,8 @@ export default function Cleaner() {
       .filter(([_, isSelected]) => isSelected)
       .map(([dir]) => cleanableDirs[dir as DirType]);
 
-    invoke("plugin:tools|run_cleaner", { dirs: dirsToClean }).then(() => {
-      btn?.classList.remove("btn-disabled");
-    });
+    await invoke("plugin:tools|run_cleaner", { dirs: dirsToClean });
+    btn?.classList.remove("btn-disabled");
   };
 
   return (
@@ -61,24 +59,23 @@ export default function Cleaner() {
       <h1>Liberador de espacio</h1>
       <p>Libera espacio borrando archivos residuales de tu equipo automáticamente.</p>
       <h4>Selecciona los archivos que se van a borrar</h4>
-      <CheckBox text="Archivos temporales del usuario" checked={selectedDirs.temp} onChange={() => handleCheckboxChange("temp")} />
-      <CheckBox text="Archivos temporales del sistema" checked={selectedDirs.tempSystem} onChange={() => handleCheckboxChange("tempSystem")} />
-      <CheckBox text="Descargas" checked={selectedDirs.downloads} onChange={() => handleCheckboxChange("downloads")} />
+      {Object.entries(selectedDirs).map(([dir, checked]) => (
+        <CheckBox
+          key={dir}
+          text={`Archivos ${dir === 'temp' ? 'temporales del usuario' : dir === 'tempSystem' ? 'temporales del sistema' : 'de descargas'}`}
+          checked={checked}
+          onChange={() => handleCheckboxChange(dir as DirType)}
+        />
+      ))}
       <div className="lg:flex justify-between items-center mt-4 lg:mt-0">
         <button id="button" className="btn btn-primary" onClick={runCleaner}>Liberar espacio</button>
         <div className="stats shadow-lg mt-4 lg:mt-0">
-          <div className="stat place-items-center">
-            <div className="stat-title">Archivos eliminados</div>
-            <div className="stat-value">{stats.deleted}</div>
-          </div>
-          <div className="stat place-items-center">
-            <div className="stat-title">Archivos totales</div>
-            <div className="stat-value">{stats.total}</div>
-          </div>
-          <div className="stat place-items-center">
-            <div className="stat-title">Espacio liberado</div>
-            <div className="stat-value">{stats.freed}</div>
-          </div>
+          {Object.entries(stats).map(([key, value]) => (
+            <div key={key} className="stat place-items-center">
+              <div className="stat-title">{key === 'deleted' ? 'Archivos eliminados' : key === 'total' ? 'Archivos totales' : 'Espacio liberado'}</div>
+              <div className="stat-value">{value}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
