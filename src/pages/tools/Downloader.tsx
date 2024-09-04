@@ -68,6 +68,7 @@ export default function Downloader() {
   const installDeps = async (button: HTMLButtonElement) => {
     button.classList.add("btn-disabled");
     await invoke("plugin:tools|install_downloader_deps");
+    button.classList.remove("btn-disabled");
     setDepsInstalled(true);
   }
 
@@ -96,7 +97,7 @@ export default function Downloader() {
             Presiona este botón para descargarlos automáticamente donde está instalado Kaizen.<br />
             Solo tomará unos segundos.
           </p>
-          <button className="btn btn-primary" onClick={(e) => installDeps(e.target as HTMLButtonElement)}>Descargar</button>
+          <button id="btn-deps" className="btn btn-primary" onClick={(e) => installDeps(e.target as HTMLButtonElement)}>Descargar</button>
         </>
         :
         <>
