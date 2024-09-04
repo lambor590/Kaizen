@@ -81,7 +81,6 @@ export default function Downloader() {
   };
 
   return (
-
     <div className="prose">
       <h1>Descarga de vídeos y audios</h1>
       <p>Descarga vídeos y audios de más de 1.000 plataformas diferentes.</p>
