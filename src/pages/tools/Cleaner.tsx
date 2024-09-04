@@ -11,7 +11,7 @@ type EventData = {
   freed_space: number;
 };
 
-type DirType = 'temp' | 'tempSystem' | 'downloads';
+type DirType = "temp" | "tempSystem" | "downloads";
 
 export default function Cleaner() {
   const [dirs, setDirs] = useState({ temp: "", downloads: "" });
@@ -44,15 +44,15 @@ export default function Cleaner() {
   };
 
   const runCleaner = () => {
-    const btn = document.querySelector('#button');
-    btn?.classList.add('btn-disabled');
+    const btn = document.querySelector("#button");
+    btn?.classList.add("btn-disabled");
 
     const dirsToClean = Object.entries(selectedDirs)
       .filter(([_, isSelected]) => isSelected)
       .map(([dir]) => cleanableDirs[dir as DirType]);
 
     invoke("plugin:tools|run_cleaner", { dirs: dirsToClean }).then(() => {
-      btn?.classList.remove('btn-disabled');
+      btn?.classList.remove("btn-disabled");
     });
   };
 
@@ -61,9 +61,9 @@ export default function Cleaner() {
       <h1>Liberador de espacio</h1>
       <p>Libera espacio borrando archivos residuales de tu equipo automáticamente.</p>
       <h4>Selecciona los archivos que se van a borrar</h4>
-      <CheckBox text="Archivos temporales del usuario" checked={selectedDirs.temp} onChange={() => handleCheckboxChange('temp')} />
-      <CheckBox text="Archivos temporales del sistema" checked={selectedDirs.tempSystem} onChange={() => handleCheckboxChange('tempSystem')} />
-      <CheckBox text="Descargas" checked={selectedDirs.downloads} onChange={() => handleCheckboxChange('downloads')} />
+      <CheckBox text="Archivos temporales del usuario" checked={selectedDirs.temp} onChange={() => handleCheckboxChange("temp")} />
+      <CheckBox text="Archivos temporales del sistema" checked={selectedDirs.tempSystem} onChange={() => handleCheckboxChange("tempSystem")} />
+      <CheckBox text="Descargas" checked={selectedDirs.downloads} onChange={() => handleCheckboxChange("downloads")} />
       <div className="lg:flex justify-between items-center mt-4 lg:mt-0">
         <button id="button" className="btn btn-primary" onClick={runCleaner}>Liberar espacio</button>
         <div className="stats shadow-lg mt-4 lg:mt-0">
