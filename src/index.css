@@ -68,3 +68,13 @@ body {
 .prose {
   max-width: none;
 }
+
+.video-thumbnail::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background: inherit;
+  filter: blur(20px) saturate(200%);
+  z-index: -1;
+}
