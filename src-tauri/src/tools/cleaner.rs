@@ -11,7 +11,7 @@ pub async fn run_cleaner<R: Runtime>(window: Window<R>, dirs: Vec<String>) -> Ka
     let mut freed_space: f64 = 0.0;
 
     for dir in &dirs {
-        if let Ok(entries) = fs::read_dir(&dir) {
+        if let Ok(entries) = fs::read_dir(dir) {
             for entry in entries.filter_map(Result::ok) {
                 total_files += 1;
                 let path: PathBuf = entry.path();

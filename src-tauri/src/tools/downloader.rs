@@ -60,7 +60,7 @@ pub async fn run_downloader(config: DownloaderConfig) -> KaizenResult<()> {
 #[tauri::command]
 pub async fn get_video_data(url: String) -> Result<String, String> {
     let output: std::process::Output = Command::new(&*YT_DLP_PATH)
-        .args(&["-J", "--no-warnings", &url])
+        .args(["-J", "--no-warnings", &url])
         .creation_flags(CREATE_NO_WINDOW)
         .output()
         .map_err(|e: std::io::Error| e.to_string())?;
