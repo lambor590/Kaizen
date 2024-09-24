@@ -49,6 +49,14 @@ pub async fn run_downloader(config: DownloaderConfig) -> KaizenResult<()> {
     args.extend(extra_args);
     args.push(&config.video_url);
 
+    // pitch testing
+    // "--exec",
+    // "ffmpeg -i {} -filter:a asetrate=44100*1.4,aresample=44100,atempo=1/1.286 \"test.mp3\"",
+    // let output_file: String = format!("{}/yt-dlp_output.log", config.output_folder);
+    // let file: fs::File = fs::File::create(&output_file)?;
+    // .stdout(std::process::Stdio::from(file.try_clone()?))
+    // .stderr(std::process::Stdio::from(file))
+
     Command::new(&*YT_DLP_PATH)
         .args(&args)
         .creation_flags(CREATE_NO_WINDOW)
