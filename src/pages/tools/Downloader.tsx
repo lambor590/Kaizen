@@ -1,6 +1,8 @@
 import { invoke } from "@tauri-apps/api";
 import { useEffect, useState } from "preact/hooks";
 import { open } from "@tauri-apps/api/dialog";
+import CheckBox from "@/components/generic/Checkbox";
+import Label from "@/components/generic/Label";
 
 type VideoData = {
   title: string;
@@ -12,7 +14,7 @@ type VideoData = {
 };
 
 export default function Downloader() {
-  const [config, setConfig] = useState({ video_url: "", format: "video", quality: "best", output_folder: "" });
+  const [config, setConfig] = useState({ video_url: "", format: "video", quality: "best", output_folder: "", pitch: 1, preserveDuration: true });
   const [videoData, setVideoData] = useState<VideoData>();
   const [depsInstalled, setDepsInstalled] = useState(true);
 
@@ -77,36 +79,36 @@ export default function Downloader() {
         :
         <>
           <div className="grid grid-cols-2 gap-8 mb-10">
-            <label className="form-control">
-              <div className="label">
-                <span className="label-text">URL</span>
-              </div>
+            <Label text="URL">
               <input type="text" placeholder="https://youtu.be/dQw4w9WgXcQ" name="video_url" className="input input-bordered w-full" onFocusOut={handleChange} />
-            </label>
-            <label className="form-control">
-              <div className="label">
-                <span className="label-text">Carpeta de destino</span>
-              </div>
+            </Label>
+            <Label text="Carpeta de destino">
               <input type="text" onClick={selectFolder} id="folder-path" placeholder="Seleccionar carpeta de destino" className="input input-bordered w-full cursor-pointer" readOnly />
-            </label>
-            <label className="form-control">
-              <div className="label">
-                <span className="label-text">Formato</span>
-              </div>
+            </Label>
+            <Label text="Formato">
               <select name="format" className="select select-bordered w-full" onChange={handleChange}>
-                <option value="video">Vídeo sin audio (si está disponible)</option>
-                <option value="audio">Audio sin vídeo</option>
+                <option value="video">Solo vídeo (si está disponible)</option>
+                <option value="audio">Solo audio</option>
                 <option value="both">Vídeo y audio</option>
               </select>
-            </label>
-            <label className="form-control">
-              <div className="label">
-                <span className="label-text">Calidad</span>
-              </div>
+            </Label>
+            <Label text="Calidad">
               <select name="quality" className="select select-bordered w-full" onChange={handleChange}>
                 <option value="best">Mejor</option>
               </select>
-            </label>
+            </Label>
+            <Label text="Tono">
+              <select name="pitch" className="select select-bordered w-full" onChange={handleChange}>
+                <option value={1.5} >Muy agudo</option>
+                <option value={1.3} >Agudo</option>
+                <option value={1.1} >Un poco agudo</option>
+                <option value={1} selected >Normal</option>
+                <option value={0.9}>Un poco grave</option>
+                <option value={0.7}>Grave</option>
+                <option value={0.5}>Muy grave</option>
+              </select>
+            </Label>
+            <CheckBox text="Conservar duración" checked={config.preserveDuration} onChange={() => setConfig(prev => ({ ...prev, remux: !prev.preserveDuration }))} />
           </div>
           {videoData && (
             <div className="grid grid-cols-2 gap-8 mb-10">
