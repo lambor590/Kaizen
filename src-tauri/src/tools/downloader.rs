@@ -13,6 +13,7 @@ pub struct DownloaderConfig {
     video_url: String,
     format: String,
     quality: String,
+    pitch: String,
     output_folder: String,
 }
 
@@ -26,41 +27,73 @@ lazy_static! {
 
 #[tauri::command]
 pub async fn run_downloader(config: DownloaderConfig) -> KaizenResult<()> {
-    let (output_format, extra_args): (&str, Vec<&str>) =
-        match (config.format.as_str(), config.quality.as_str()) {
-            ("video", "best") => ("--format", vec!["bestvideo/b", "--remux-video", "mp4"]),
-            ("both", "best") => (
-                "--format",
-                vec!["bestvideo+bestaudio/b", "--remux-video", "mp4"],
-            ),
-            ("audio", _) => ("-x", vec!["--audio-format", "mp3", "--audio-quality", "0"]),
-            (_, other) => (other, vec![]),
-        };
+    let extra_args: Vec<&str> = match (config.format.as_str(), config.quality.as_str()) {
+        ("video", "best") => vec!["--format", "bestvideo/b", "--remux-video", "mp4"],
+        ("both", "best") => vec!["--format", "bestvideo+bestaudio/b", "--remux-video", "mp4"],
+        ("audio", _) => vec!["-x", "--audio-format", "mp3", "--audio-quality", "0"],
+        (_, other) => vec![other],
+    };
 
-    let mut args: Vec<&str> = vec![
-        "--no-playlist",
-        "--quiet",
-        "-P",
-        &config.output_folder,
-        "-P",
-        "temp:%temp%",
-        output_format,
+    let temp_dir: PathBuf = env::temp_dir();
+    let output_dir: PathBuf = PathBuf::from(&config.output_folder);
+
+    let mut args: Vec<String> = vec![
+        "--no-playlist".to_string(),
+        "--quiet".to_string(),
+        "-P".to_string(),
     ];
-    args.extend(extra_args);
-    args.push(&config.video_url);
 
-    // pitch testing
-    // "--exec",
-    // "ffmpeg -i {} -filter:a asetrate=44100*1.4,aresample=44100,atempo=1/1.286 \"test.mp3\"",
-    // let output_file: String = format!("{}/yt-dlp_output.log", config.output_folder);
-    // let file: fs::File = fs::File::create(&output_file)?;
-    // .stdout(std::process::Stdio::from(file.try_clone()?))
-    // .stderr(std::process::Stdio::from(file))
+    let initial_output_dir: &str = if config.pitch != "1.0" {
+        temp_dir.to_str().unwrap()
+    } else {
+        output_dir.to_str().unwrap()
+    };
+
+    args.push(initial_output_dir.to_string());
+    args.extend(extra_args.iter().map(|s: &&str| s.to_string()));
+    args.push(config.video_url.clone());
 
     Command::new(&*YT_DLP_PATH)
         .args(&args)
         .creation_flags(CREATE_NO_WINDOW)
+        .status()?;
+
+    if config.pitch == "1.0" {
+        return Ok(());
+    };
+
+    let downloaded_file: fs::DirEntry = fs::read_dir(temp_dir)?
+        .filter_map(Result::ok)
+        .filter(|entry: &fs::DirEntry| {
+            entry
+                .file_name()
+                .to_string_lossy()
+                .ends_with(if config.format == "audio" {
+                    ".mp3"
+                } else {
+                    ".mp4"
+                })
+        })
+        .last()
+        .ok_or("No se encontró el archivo descargado")
+        .unwrap();
+
+    let input_path: PathBuf = downloaded_file.path();
+    let output_path: PathBuf = output_dir.join(downloaded_file.file_name());
+
+    Command::new("ffmpeg")
+        .args([
+            "-i",
+            input_path.to_str().unwrap(),
+            "-filter:a",
+            &format!("asetrate=44100*{},aresample=44100", config.pitch),
+            "-y",
+            output_path.to_str().unwrap(),
+        ])
+        .creation_flags(CREATE_NO_WINDOW)
         .output()?;
+
+    fs::remove_file(input_path)?;
 
     Ok(())
 }
@@ -76,8 +109,9 @@ pub async fn get_video_data(url: String) -> Result<String, String> {
     if output.status.success() {
         String::from_utf8(output.stdout).map_err(|e: std::string::FromUtf8Error| e.to_string())
     } else {
-        Err(String::from_utf8_lossy(&output.stderr).into_owned())
+        Err(String::from_utf8_lossy(&output.stderr).to_string())
     }
+    .map_err(|e: String| e.to_string())
 }
 
 #[tauri::command]
@@ -86,8 +120,7 @@ pub async fn check_downloader_deps() -> bool {
         .arg("--version")
         .creation_flags(CREATE_NO_WINDOW)
         .status()
-        .map(|status: std::process::ExitStatus| status.success())
-        .unwrap_or(false)
+        .map_or(false, |status: std::process::ExitStatus| status.success())
 }
 
 #[tauri::command]
@@ -99,7 +132,8 @@ pub async fn install_downloader_deps() -> KaizenResult<()> {
         .to_path_buf();
 
     async fn download_and_save(url: &str, path: &PathBuf) -> KaizenResult<()> {
-        fs::write(path, get(url).await.unwrap().bytes().await.unwrap()).unwrap();
+        let bytes = get(url).await.unwrap().bytes().await.unwrap();
+        fs::write(path, bytes)?;
         Ok(())
     }
 
@@ -109,16 +143,21 @@ pub async fn install_downloader_deps() -> KaizenResult<()> {
     )
     .await?;
 
-    let ffmpeg_response = get("https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip").await.unwrap().bytes().await.unwrap();
-    let mut ffmpeg_zip = ZipArchive::new(Cursor::new(ffmpeg_response)).unwrap();
+    let ffmpeg_bytes = get("https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip")
+        .await
+        .unwrap()
+        .bytes()
+        .await
+        .unwrap();
+
+    let mut ffmpeg_zip = ZipArchive::new(Cursor::new(ffmpeg_bytes)).unwrap();
 
     for i in 0..ffmpeg_zip.len() {
         let mut file: zip::read::ZipFile<'_> = ffmpeg_zip.by_index(i).unwrap();
         if let Some(name) = file.enclosed_name() {
             if name.starts_with("ffmpeg-master-latest-win64-gpl/bin") {
                 let outpath: PathBuf = exe_dir.join(name.file_name().unwrap());
-                let mut outfile: fs::File = fs::File::create(outpath)?;
-                std::io::copy(&mut file, &mut outfile).unwrap();
+                std::io::copy(&mut file, &mut fs::File::create(outpath)?)?;
             }
         }
     }
