@@ -44,7 +44,7 @@ impl WindowsAPI {
         }
     }
 
-    pub fn restart_as_admin() {
+    pub fn restart_as_admin() -> bool {
         std::process::Command::new("powershell")
             .arg("-Command")
             .arg("Start-Process")
