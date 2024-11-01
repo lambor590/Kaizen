@@ -1,6 +1,5 @@
 import { createSignal, onMount } from 'solid-js';
 import { check, Update } from '@tauri-apps/plugin-updater';
-import { relaunch } from '@tauri-apps/plugin-process';
 import Modal from '@components/generic/Modal';
 import Countdown from '@components/generic/Countdown';
 
