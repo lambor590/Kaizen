@@ -2,30 +2,54 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:4321"
   },
-  "package": {
-    "productName": "Kaizen",
-    "version": "../package.json"
-  },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "The Ghost",
+    "category": "Utility",
+    "copyright": "Copyright © 2024 The Ghost",
+    "shortDescription": "Kaizen",
+    "longDescription": "Herramientas para ahorrar tiempo y mantener tu equipo en buen estado.",
+    "windows": {
+      "wix": {
+        "language": "es-ES"
       },
-      "os": {
-        "all": true
-      },
-      "path": {
-        "all": true
-      },
-      "dialog": {
-        "open": true,
-        "save": true
+      "nsis": {
+        "languages": [
+          "English",
+          "Spanish"
+        ],
+        "installerIcon": "icons/icon.ico"
       }
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "createUpdaterArtifacts": "v1Compatible"
+  },
+  "productName": "Kaizen",
+  "mainBinaryName": "Kaizen",
+  "version": "../package.json",
+  "identifier": "ghost.kaizen.app",
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ0OUY2NkUzQTRBODUyNjEKUldSaFVxaWs0MmFmUkJGTXhreVhGV3d5UzZldkZCc3hhY3hXL25tdHZZUHBuSUo5OGUxZUUzcTIK",
+      "endpoints": [
+        "https://github.com/lambor590/Kaizen/releases/latest/download/latest.json"
+      ]
+    }
+  },
+  "app": {
+    "security": {
+      "csp": null,
+      "capabilities": ["desktop"]
     },
     "windows": [
       {
@@ -38,11 +62,10 @@
         "transparent": true,
         "skipTaskbar": true,
         "resizable": false,
-        "alwaysOnTop": true
+        "alwaysOnTop": true,
+        "shadow": false
       },
       {
-        "fullscreen": false,
-        "resizable": true,
         "title": "Kaizen",
         "width": 1270,
         "height": 600,
@@ -51,46 +74,6 @@
         "center": true,
         "visible": false
       }
-    ],
-    "security": {
-      "csp": null
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "publisher": "The Ghost",
-      "category": "Utility",
-      "copyright": "Copyright © 2024 The Ghost",
-      "shortDescription": "Kaizen",
-      "longDescription": "Herramientas para ahorrar tiempo y mantener tu equipo en buen estado.",
-      "identifier": "ghost.kaizen.app",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "windows": {
-        "wix": {
-          "language": "es-ES"
-        },
-        "nsis": {
-          "languages": [
-            "English",
-            "Spanish"
-          ],
-          "installerIcon": "icons/icon.ico"
-        }
-      }
-    },
-    "updater": {
-      "active": true,
-      "endpoints": [
-        "https://github.com/lambor590/Kaizen/releases/latest/download/latest.json"
-      ],
-      "dialog": false,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ0OUY2NkUzQTRBODUyNjEKUldSaFVxaWs0MmFmUkJGTXhreVhGV3d5UzZldkZCc3hhY3hXL25tdHZZUHBuSUo5OGUxZUUzcTIK"
-    }
+    ]
   }
 }
