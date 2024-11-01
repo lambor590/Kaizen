@@ -1,0 +1,13 @@
+---
+import CleanerContent from "@components/content/Cleaner";
+import Layout from "@layouts/Layout.astro";
+---
+
+<Layout>
+  <h1>Liberador de espacio</h1>
+  <p>
+    Libera espacio borrando archivos residuales de tu equipo automáticamente.
+  </p>
+  <h4>Selecciona los archivos que se van a borrar</h4>
+  <CleanerContent client:load />
+</Layout>

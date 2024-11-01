@@ -1,0 +1,16 @@
+---
+import DownloaderContent from "@components/content/Downloader";
+import Layout from "@layouts/Layout.astro";
+---
+
+<Layout>
+  <h1>Descarga de vídeos y audios</h1>
+  <p>Descarga vídeos y audios de más de 1.000 plataformas diferentes.</p>
+  <small class="text-warning">
+    Esta herramienta está en constante desarrollo y es experimental.<br />
+    Algunas cosas mejorarán con el tiempo y se incluirán nuevas características.<br
+    />
+    Puedes hacer sugerencias en Discord.
+  </small>
+  <DownloaderContent client:load />
+</Layout>
