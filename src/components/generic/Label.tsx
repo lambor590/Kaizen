@@ -1,17 +1,17 @@
-import { ComponentChildren } from "preact";
+import type { JSX } from 'solid-js';
 
 interface Props {
   text: string;
-  children?: ComponentChildren;
+  children?: JSX.Element;
 }
 
-export default function Label(props: Props) {
+export default function Label({ text, children }: Props) {
   return (
-    <label className="form-control">
-      <div className="label">
-        <span className="label-text">{props.text}</span>
+    <label class="form-control">
+      <div class="label">
+        <span class="label-text">{text}</span>
       </div>
-      {props.children}
+      {children}
     </label>
   );
 }
