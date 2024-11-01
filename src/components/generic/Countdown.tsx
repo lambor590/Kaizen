@@ -1,27 +1,27 @@
-import { useEffect, useState } from 'preact/hooks';
+import { createSignal, onCleanup } from 'solid-js';
 
 interface Props {
-  initialNumber: number;
+  initialNumber?: number;
   onFinish?: () => void;
 }
 
-export default function Countdown(props: Props) {
-  const [timeLeft, setTimeLeft] = useState(props.initialNumber);
+export default function Countdown({ initialNumber = 0, onFinish }: Props) {
+  const [timeLeft, setTimeLeft] = createSignal(initialNumber);
 
-  useEffect(() => {
-    let timer = setInterval(() => {
-      setTimeLeft((time) => {
-        if (time !== 0) return time - 1;
-        clearInterval(timer);
-        props.onFinish?.();
-        return 0;
-      });
-    }, 1000);
-  }, []);
+  const timer = setInterval(() => {
+    if (timeLeft() === 0) {
+      clearInterval(timer);
+      onFinish?.();
+      return;
+    }
+    setTimeLeft(timeLeft() - 1);
+  }, 1000);
+
+  onCleanup(() => clearInterval(timer));
 
   return (
-    <div className="countdown font-mono text-6xl flex flex-col items-center">
-      <span style={{ "--value": timeLeft }}></span>
+    <div class="countdown font-mono text-6xl flex flex-col items-center">
+      <span style={{ "--value": timeLeft() }}></span>
     </div>
-  )
+  );
 }
