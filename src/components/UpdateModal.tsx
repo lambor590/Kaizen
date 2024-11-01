@@ -1,5 +1,5 @@
 import { createSignal, onMount } from 'solid-js';
-import { check } from '@tauri-apps/plugin-updater';
+import { check, Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import Modal from '@components/generic/Modal';
 import Countdown from '@components/generic/Countdown';
@@ -9,16 +9,17 @@ export default function UpdateModal() {
   const title = "Actualización disponible";
   const message = "La aplicación se va a reiniciar para actualizarse.";
 
+  let update: Update | null = null;
   onMount(async () => {
-    const update = await check();
+    update = await check();
     if (update) {
       setUpdateAvailable(true);
-      update.downloadAndInstall();
+      await update.download();
     }
   });
 
   const handleFinish = async () => {
-    await relaunch();
+    await update?.install();
   };
 
   return (
