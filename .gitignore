@@ -25,3 +25,6 @@ dist-ssr
 
 # Updater
 keys
+
+# Astro
+.astro
