@@ -22,7 +22,7 @@ const LABELS = {
 } as const;
 
 export default function CleanerContent() {
-  const [selectedDirs, setSelectedDirs] = createSignal<Record<DirKeys, boolean>>({ temp: true, tempSystem: true, downloads: true });
+  const [selectedDirs, setSelectedDirs] = createSignal<Record<DirKeys, boolean>>({ temp: true, tempSystem: true, downloads: false });
   const [stats, setStats] = createSignal<Stats>({ deleted: 0, total: 0, freed: 0 });
   const [cleanableDirs, setCleanableDirs] = createSignal<Dirs>({ temp: "", tempSystem: "", downloads: "" });
 
