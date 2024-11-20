@@ -34,66 +34,57 @@ pub async fn run_downloader(config: DownloaderConfig) -> KaizenResult<()> {
         (_, other) => vec![other],
     };
 
-    let temp_dir: PathBuf = env::temp_dir();
-    let output_dir: PathBuf = PathBuf::from(&config.output_folder);
-
-    let mut args: Vec<String> = vec![
-        "--no-playlist".to_string(),
-        "--quiet".to_string(),
-        "-P".to_string(),
-    ];
-
-    let initial_output_dir: &str = if config.pitch != "1.0" {
+    let (temp_dir, output_dir) = (env::temp_dir(), PathBuf::from(&config.output_folder));
+    let is_pitch_modified: bool = config.pitch != "1.0";
+    let initial_output_dir: &str = if is_pitch_modified {
         temp_dir.to_str().unwrap()
     } else {
         output_dir.to_str().unwrap()
     };
 
-    args.push(initial_output_dir.to_string());
-    args.extend(extra_args.iter().map(|s: &&str| s.to_string()));
-    args.push(config.video_url.clone());
+    let mut args: Vec<&str> = vec!["--no-playlist", "--quiet", "-P", initial_output_dir];
+    args.extend(extra_args.iter().map(|s: &&str| s));
+    args.push(&config.video_url);
 
     Command::new(&*YT_DLP_PATH)
         .args(&args)
         .creation_flags(CREATE_NO_WINDOW)
-        .status()?;
-
-    if config.pitch == "1.0" {
-        return Ok(());
-    };
-
-    let downloaded_file: fs::DirEntry = fs::read_dir(temp_dir)?
-        .filter_map(Result::ok)
-        .filter(|entry: &fs::DirEntry| {
-            entry
-                .file_name()
-                .to_string_lossy()
-                .ends_with(if config.format == "audio" {
-                    ".mp3"
-                } else {
-                    ".mp4"
-                })
-        })
-        .last()
-        .ok_or("No se encontró el archivo descargado")
-        .unwrap();
-
-    let input_path: PathBuf = downloaded_file.path();
-    let output_path: PathBuf = output_dir.join(downloaded_file.file_name());
-
-    Command::new("ffmpeg")
-        .args([
-            "-i",
-            input_path.to_str().unwrap(),
-            "-filter:a",
-            &format!("asetrate=44100*{},aresample=44100", config.pitch),
-            "-y",
-            output_path.to_str().unwrap(),
-        ])
-        .creation_flags(CREATE_NO_WINDOW)
         .output()?;
 
-    fs::remove_file(input_path)?;
+    if is_pitch_modified {
+        let downloaded_file: fs::DirEntry = fs::read_dir(temp_dir)?
+            .filter_map(Result::ok)
+            .filter(|entry: &fs::DirEntry| {
+                entry
+                    .file_name()
+                    .to_string_lossy()
+                    .ends_with(if config.format == "audio" {
+                        ".mp3"
+                    } else {
+                        ".mp4"
+                    })
+            })
+            .last()
+            .ok_or("No se encontró el archivo descargado")
+            .unwrap();
+
+        let input_path: PathBuf = downloaded_file.path();
+        let output_path: PathBuf = output_dir.join(downloaded_file.file_name());
+
+        Command::new("ffmpeg")
+            .args([
+                "-i",
+                input_path.to_str().unwrap(),
+                "-filter:a",
+                &format!("asetrate=44100*{},aresample=44100", config.pitch),
+                "-y",
+                output_path.to_str().unwrap(),
+            ])
+            .creation_flags(CREATE_NO_WINDOW)
+            .output()?;
+
+        fs::remove_file(input_path)?;
+    }
 
     Ok(())
 }
