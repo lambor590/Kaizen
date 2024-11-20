@@ -124,9 +124,9 @@ export default function DownloaderContent() {
                 class="select select-bordered w-full"
                 onChange={handleChange}
               >
-                <option value="video">Solo vídeo (si está disponible)</option>
                 <option value="audio">Solo audio</option>
                 <option value="both">Vídeo y audio</option>
+                <option value="video">Solo vídeo (si está disponible)</option>
               </select>
             </Label>
             <Label text="Calidad">
