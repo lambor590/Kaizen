@@ -5,18 +5,18 @@ authors = ["lambor590"]
 edition = "2021"
 
 [build-dependencies]
-tauri-build = { version = "2.0.2", features = [] }
+tauri-build = { version = "2.0.3", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.6", features = [] }
-serde = { version = "1.0.214", features = ["derive"] }
+tauri = { version = "2.1.1", features = [] }
+serde = { version = "1.0.215", features = ["derive"] }
 winapi = { version = "0.3.9", features = [
     "handleapi",
     "securitybaseapi",
     "winbase",
 ] }
-serde_json = "1.0.132"
-thiserror = "1.0.66"
+serde_json = "1.0.133"
+thiserror = "2.0.3"
 lazy_static = "1.5.0"
 reqwest = { version = "0.12.9", default-features = false, features = [
     "rustls-tls",
