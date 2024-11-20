@@ -18,7 +18,7 @@ export default function DownloaderContent() {
     format: "video",
     quality: "best",
     output_folder: "",
-    pitch: 1.0,
+    pitch: "1.0",
   });
 
   const [videoData, setVideoData] = createSignal<VideoData | null>(null);
@@ -144,13 +144,13 @@ export default function DownloaderContent() {
                 class="select select-bordered w-full"
                 onChange={handleChange}
               >
-                <option value={1.6}>Muy agudo</option>
-                <option value={1.4}>Agudo</option>
-                <option value={1.2}>Un poco agudo</option>
-                <option value={1.0} selected>Normal</option>
-                <option value={0.8}>Un poco grave</option>
-                <option value={0.6}>Grave</option>
-                <option value={0.4}>Muy grave</option>
+                <option value="1.6">Muy agudo</option>
+                <option value="1.4">Agudo</option>
+                <option value="1.2">Un poco agudo</option>
+                <option value="1.0" selected>Normal</option>
+                <option value="0.8">Un poco grave</option>
+                <option value="0.6">Grave</option>
+                <option value="0.4">Muy grave</option>
               </select>
             </Label>
           </div>
